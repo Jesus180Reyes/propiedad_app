@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:propiedad_app/services/map_provider.dart';
+import 'package:propiedad_app/views/google_maps_widget.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -8,25 +8,34 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mapList = Provider.of<MapProvider>(context).list;
-    final polygonPoints = Provider.of<MapProvider>(context).points;
-    const CameraPosition kGooglePlex = CameraPosition(
-      target: LatLng(13.171576, -87.075614),
-      zoom: 14.4746,
-    );
+    final isMapNormal = Provider.of<MapProvider>(context);
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: GoogleMap(
-        mapToolbarEnabled: true,
-        compassEnabled: true,
-        mapType: MapType.normal,
-        initialCameraPosition: kGooglePlex,
-        markers: mapList.map((e) => e).toSet(),
-        polygons: {
-          Polygon(
-            polygonId: PolygonId(polygonPoints.id),
-            points: polygonPoints.routes,
+      floatingActionButton: SafeArea(
+        child: Container(
+          alignment: Alignment.bottomLeft,
+          margin: EdgeInsets.symmetric(
+            horizontal: size.width * 0.08,
+            vertical: size.height * 0.02,
           ),
-        },
+          child: FloatingActionButton(
+            tooltip: "Toca para cambiar de mapa",
+            onPressed: () {
+              isMapNormal.cambiarDisenoMapa();
+              print(isMapNormal.isNormalMap);
+            },
+            child: Icon(
+              isMapNormal.isNormalMap ? Icons.map_rounded : Icons.map_outlined,
+            ),
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: Stack(
+          children: const [
+            GoogleMapsWidget(),
+          ],
+        ),
       ),
     );
   }
